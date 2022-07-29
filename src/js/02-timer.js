@@ -24,8 +24,7 @@ const options = {
      
     if (selectedDates[0] < Date.now()) {
       Notify.failure('Please choose a date in the future');
-        // window.alert("Please choose a date in the future")
-        return;
+      return;
   }
     refs.startBtn.removeAttribute('disabled');
     Notify.success('Please, press to Start to activate countdown');
@@ -49,11 +48,11 @@ function handleStartBtn() {
 
   intervalID = setInterval(() => {
     
-    const currentTime = Date.now();
-    const deltaTime = deadlineTime - currentTime;
-    const convertTime = convertMs(deltaTime);
-    updateTimerMarkup(convertTime);
-    
+  const currentTime = Date.now();
+  const deltaTime = deadlineTime - currentTime;
+  const convertTime = convertMs(deltaTime);
+  updateTimerMarkup(convertTime);
+  
     if (deltaTime <= 0) {
      
       clearInterval(intervalID);
