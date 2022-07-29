@@ -25,7 +25,7 @@ const options = {
     if (selectedDates[0] < Date.now()) {
       Notify.failure('Please choose a date in the future');
       return;
-  }
+    }
     refs.startBtn.removeAttribute('disabled');
     Notify.success('Please, press to Start to activate countdown');
     
@@ -33,37 +33,40 @@ const options = {
 };
 
 const calendar = flatpickr("#datetime-picker", options);
+class Timer {
+  constructor({markup}) {
+    this.intervalID = null;
+    this.isActiveTimer = false;
+    this.markup = markup;
+  }
+  start() {
+    if (this.isActiveTimer) return;
 
-refs.startBtn.addEventListener('click', handleStartBtn);
-
-function handleStartBtn() {
-  let isActiveTimer = false;
-  let intervalID = null;
-  if (isActiveTimer)  return ;
-
-  isActiveTimer = true;
-  const deadlineTime = calendar.selectedDates[0];
-  
-// refs.startBtn.setAttribute('disabled', true) або зробити неактивною кнопку коли таймер вже запущено
-
-  intervalID = setInterval(() => {
-    
-  const currentTime = Date.now();
-  const deltaTime = deadlineTime - currentTime;
-  const convertTime = convertMs(deltaTime);
-  updateTimerMarkup(convertTime);
-  
-    if (deltaTime <= 0) {
+    this.isActiveTimer = true;
+    const deadlineTime = calendar.selectedDates[0];
      
-      clearInterval(intervalID);
-      updateTimerMarkup({ days:0,hours:0,minutes:0,seconds:0});
-      isActiveTimer = false;
-    }
-  }, 1000);
-    
-}
+    // refs.startBtn.setAttribute('disabled', true) або зробити неактивною кнопку коли таймер вже запущено
 
-function convertMs(ms) {
+    this.intervalID = setInterval(() => {
+    
+      const currentTime = Date.now();
+      const deltaTime = deadlineTime - currentTime;
+      const convertTime = this.convertMs(deltaTime);
+      this.markup(convertTime);
+
+      if (deltaTime <= 0) {
+     
+        clearInterval(this.intervalID);
+        const endTime = this.convertMs(0);
+        this.markup(endTime);
+        this.isActiveTimer = false;
+    }
+    
+    }, 1000);
+    
+  }
+   
+  convertMs(ms) {
   // Number of milliseconds per unit of time
   const second = 1000;
   const minute = second * 60;
@@ -71,28 +74,42 @@ function convertMs(ms) {
   const day = hour * 24;
 
   // Remaining days
-  const days = Math.floor(ms / day);
+  const days = this.addLeadingZero(Math.floor(ms / day));
   // Remaining hours
-  const hours = Math.floor((ms % day) / hour);
+  const hours = this.addLeadingZero(Math.floor((ms % day) / hour));
   // Remaining minutes
-  const minutes = Math.floor(((ms % day) % hour) / minute);
+  const minutes = this.addLeadingZero(Math.floor(((ms % day) % hour) / minute));
   // Remaining seconds
-  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+  const seconds = this.addLeadingZero(Math.floor((((ms % day) % hour) % minute) / second));
 
   return { days, hours, minutes, seconds };
-};
+  }
 
-function addLeadingZero(value) {
+  addLeadingZero(value) {
 
   return String(value).padStart(2, '0');
    
 };
 
+
+}
+
+const timer = new Timer({
+  markup: updateTimerMarkup,
+});
+
+refs.startBtn.addEventListener('click', handleStartBtn);
+
+function handleStartBtn() {
+  timer.start();
+  
+}
+
 function updateTimerMarkup({days, hours, minutes, seconds}) {
 
-  refs.counterDays.textContent = addLeadingZero(days);
-  refs.counterHours.textContent = addLeadingZero(hours);
-  refs.counterMinutes.textContent = addLeadingZero(minutes);
-  refs.counterSeconds.textContent = addLeadingZero(seconds);
+  refs.counterDays.textContent = days;
+  refs.counterHours.textContent = hours;
+  refs.counterMinutes.textContent = minutes;
+  refs.counterSeconds.textContent = seconds;
   
 };
