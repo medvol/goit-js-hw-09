@@ -13,6 +13,10 @@ function handleSubmitForm(event) {
   const amountNumber = parseInt(amount.value);
   let delayNumber = parseInt(delay.value);
   const stepNumber = parseInt(step.value);
+
+  if (amountNumber < 0 || delayNumber < 0 || stepNumber < 0) {
+    return Notify.failure(`Please enter a number greater than 0`);
+  }
  
   for (let i = 0; i < amountNumber; i += 1){
     createPromise(amountNumber, delayNumber)

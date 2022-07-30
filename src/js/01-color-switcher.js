@@ -3,7 +3,7 @@ const refs = {
     stopBtn: document.querySelector('[data-stop]'),
 };
 
-let timerId = null;
+let timerID = null;
 
 refs.startBtn.classList.add('btn', 'btn--play');
 refs.stopBtn.classList.add('btn', 'btn--stop');
